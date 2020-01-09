@@ -93,6 +93,7 @@ public class MainWindowController implements Initializable {
     }
 
 
+
 public void funkcja() throws IOException, InterruptedException {
     FileUtils.cleanDirectory(new File("C:/Program Files/Neo4jServer/neo4j-community-3.5.12/data/databases/graph.db"));
     FileUtils.copyDirectory(new File("C:/MtxViewer/tymczasowaBazaGrafowa"), new File("C:/Program Files/Neo4jServer/neo4j-community-3.5.12/data/databases/graph.db"));
