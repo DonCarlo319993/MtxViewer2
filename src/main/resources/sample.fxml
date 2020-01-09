@@ -15,7 +15,7 @@
             <Insets left="40.0" top="80.0" />
          </StackPane.margin>
       </Button>
-      <Button mnemonicParsing="false" prefHeight="66.0" prefWidth="226.0" text="EKSPORT BG" StackPane.alignment="TOP_LEFT">
+      <Button mnemonicParsing="false" prefHeight="66.0" prefWidth="226.0" text="EKSPORT BG" StackPane.alignment="TOP_LEFT" onAction="#zapiszBaze">
          <StackPane.margin>
             <Insets left="40.0" top="180.0" />
          </StackPane.margin>
