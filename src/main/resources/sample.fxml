@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.shape.Line?>
+
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.MainWindowController">
+   <children>
+      <Button mnemonicParsing="false" prefHeight="66.0" prefWidth="226.0" text="IMPORTOWANIE" StackPane.alignment="TOP_LEFT">
+         <StackPane.margin>
+            <Insets left="40.0" top="80.0" />
+         </StackPane.margin>
+      </Button>
+      <Button mnemonicParsing="false" prefHeight="66.0" prefWidth="226.0" text="EKSPORT BG" StackPane.alignment="TOP_LEFT">
+         <StackPane.margin>
+            <Insets left="40.0" top="180.0" />
+         </StackPane.margin>
+      </Button>
+      <Button fx:id="przyciskPokazGraf" mnemonicParsing="false" prefHeight="66.0" prefWidth="226.0" text="POKAŻ GRAF" StackPane.alignment="TOP_LEFT" onAction="#funkcja">
+         <StackPane.margin>
+            <Insets left="40.0" top="280.0" />
+         </StackPane.margin>
+      </Button>
+      <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="635.0" prefWidth="837.0" StackPane.alignment="TOP_CENTER">
+         <StackPane.margin>
+            <Insets left="240.0" top="80.0" />
+         </StackPane.margin>
+         <children>
+            <Button fx:id="przyciskWybierz" onAction="#pokazDialogWindowFile" layoutX="23.0" layoutY="14.0" mnemonicParsing="false" text="Wybierz plik..." />
+            <CheckBox fx:id="metodaMieszana" layoutX="23.0" layoutY="85.0" mnemonicParsing="false" text="Metoda MTX - CSV - CYPHER" onAction="#metodaMieszanaSelected"/>
+            <CheckBox fx:id="metodaBezposrednia" layoutX="23.0" layoutY="131.0" mnemonicParsing="false" text="Metoda bezpośrednia" onAction="#metodaBezposredniSelected"/>
+            <Line endX="461.0" layoutX="346.0" layoutY="296.0" startX="-321.0" />
+            <Button fx:id="przyciskStart" onAction="#nowaBaza" layoutX="25.0" layoutY="248.0" mnemonicParsing="false" text="Start" />
+            <Line endX="571.0" layoutX="266.0" startX="-266.0" />
+            <Line endX="571.0" layoutX="266.0" layoutY="635.0" startX="-266.0" />
+            <Line endX="-100.0" endY="634.0" layoutX="100.0" layoutY="1.0" startX="-100.0" />
+            <Line endX="-99.5" endY="634.5" layoutX="937.0" startX="-100.0" />
+            <Label fx:id="etykietaLokalizacji" layoutX="154.0" layoutY="19.0" />
+         </children>
+      </Pane>
+   </children>
+</StackPane>
