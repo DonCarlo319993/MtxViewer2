@@ -8,13 +8,13 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-
 public class MainWindow extends Application {
+
+
 
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(this.getClass().getResource("/sample.fxml"));
         StackPane stackPane = loader.load();
@@ -25,6 +25,7 @@ public class MainWindow extends Application {
         primaryStage.setOnCloseRequest(event -> {
             try {
                 MainWindowController.zamknijProgram();
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -32,12 +33,12 @@ public class MainWindow extends Application {
         primaryStage.setTitle("Projekt okno");
         primaryStage.setScene(scene);
         primaryStage.show();
+
+
     }
-
-
-
 
     public static void main(String[] args) {
         launch(args);
+
     }
 }

@@ -6,25 +6,32 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 
 import java.io.*;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.Scanner;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 public class MainWindowController implements Initializable {
 
+    final static Logger logger2 = Logger.getLogger (MainWindow.class.getName ());
+    public static boolean pstryk = false;
+
     Stage stage;
     String tempNazwaPliku;
 
 
+
    @FXML
-   Button przyciskWybierz, przyciskStart, przyciskPokazGraf;
+   Button przyciskWybierz, przyciskStart, przyciskPokazGraf, odswiez;
 
    @FXML
    Label etykietaLokalizacji;
@@ -32,6 +39,8 @@ public class MainWindowController implements Initializable {
    @FXML
     CheckBox metodaMieszana, metodaBezposrednia;
 
+   @FXML
+   TextArea textArea;
 
 
 
@@ -45,7 +54,45 @@ public class MainWindowController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
     }
+
+
+/*    @FXML
+    public void logi(){
+        pstryk = true(event->{
+            textArea.appendText ("sdfsd");
+        });
+
+
+    }*/
+
+    public void setOdswiez(Button odswiez) {
+        this.odswiez = odswiez;
+    }
+
+    public Button getOdswiez() {
+        return odswiez;
+    }
+
+    @FXML
+    void odswiezLogi(){
+        try {
+            Scanner s = new Scanner(new File("C:/log4j-application.log"));
+            textArea.setWrapText (true);
+            while (s.hasNext()) {
+                if (s.hasNextLine ()) { // check if next token is an int
+                    textArea.appendText(s.nextLine ()); // display the found integer
+                    textArea.appendText ("\n");
+                } else {
+                    textArea.appendText(s.next() + " "); // else read the next token
+                }
+            }
+        } catch (FileNotFoundException ex) {
+            System.err.println(ex);
+        }
+    }
+
 
     @FXML
     void pokazDialogWindowDirectory(){
@@ -58,6 +105,7 @@ public class MainWindowController implements Initializable {
 
         }
     }
+
 
     @FXML
     public void pokazDialogWindowFile(){
@@ -95,8 +143,6 @@ public class MainWindowController implements Initializable {
     }
 
 
-
-
     @FXML
     public void nowaBaza() throws IOException {
         if (metodaBezposrednia.isSelected() && !metodaMieszana.isSelected()) {
@@ -115,13 +161,12 @@ public class MainWindowController implements Initializable {
     }
 
 
-
 public void funkcja() throws IOException, InterruptedException {
     FileUtils.cleanDirectory(new File("C:/Program Files/Neo4jServer/neo4j-community-3.5.12/data/databases/graph.db"));
     FileUtils.copyDirectory(new File("C:/MtxViewer/tymczasowaBazaGrafowa"), new File("C:/Program Files/Neo4jServer/neo4j-community-3.5.12/data/databases/graph.db"));
     Runtime.getRuntime().exec("cmd /c start /min cmd.exe /K \"cd C:/Program Files/Neo4jServer/neo4j-community-3.5.12/bin && neo4j console\"");
 
-    Thread.sleep(10000);
+    Thread.sleep(12000);
     BrowserController browserController = new BrowserController();
     browserController.otworzBrowser();
 }
@@ -156,15 +201,14 @@ public void funkcja() throws IOException, InterruptedException {
     }
 
 
-
-
-
     public void metodaBezposredniSelected(){
         metodaMieszana.setSelected(false);
+        logger2.info ("zaznaczono metodę bezpośrednią");
     }
 
     public void metodaMieszanaSelected(){
         metodaBezposrednia.setSelected(false);
+        logger2.info ("zaznaczono metodę mtx do csv do bazy grafowej");
     }
 
     public Stage getStage() {return stage; }
