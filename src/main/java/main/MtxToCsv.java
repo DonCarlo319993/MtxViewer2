@@ -86,7 +86,7 @@ public class MtxToCsv {
             logger.info ("Wykonywanie zapytania w celu stworzenia połączeń relacyjnych.");
 
 
-            Result importanteDeLaNoche =
+            Result importCSV =
                     db.execute("LOAD CSV FROM 'file:///C:/MtxViewer/tymczasowyPlikCsv/"+nazwaPliku+"' " +
                             "AS row" +
                             " MATCH (a:Pierwszy {PierwszyId: toInteger(row[0])}), (b:Pierwszy {PierwszyId: toInteger(row[1])}) " +

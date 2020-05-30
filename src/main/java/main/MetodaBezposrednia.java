@@ -64,32 +64,38 @@ public class MetodaBezposrednia {
         System.out.println("\nOd tego momentu zaczyna się macierz: \n");
         logger.info ("Zbieranie informacji o macierzy...");
 
-        while (odczyt.hasNextLine()) {
-            tekst = odczyt.nextLine();
-            System.out.println(tekst);
-            aktualnaLinia = tekst.split(" ");
-            List<Float> aktualnaLiniaInt = new ArrayList<>();
+        while (odczyt.hasNextLine()) {  // Jeśli jest następna linia w dokumencie to kręć
+            tekst = odczyt.nextLine();      //przypisuje następną linię do zmiennej typu String
+            System.out.println(tekst);      //wypisuje tę linię w terminalu
+            aktualnaLinia = tekst.split(" ");    //linia ta dzielona jest na odzielne elementy i każdy z nich tafia do tablicy typu String
+            List<Float> aktualnaLiniaInt = new ArrayList<>(); // powstaje lista typu float
 
-            if (aktualnaLinia.length < 3) {
-                aktualnaLiniaInt.add(Float.parseFloat(aktualnaLinia[aktualnaLinia.length - 1]));
-                aktualnaLiniaInt.add((float) 1);
-            } else {
-                aktualnaLiniaInt.add(Float.parseFloat(aktualnaLinia[aktualnaLinia.length - 2]));
-                aktualnaLiniaInt.add(Float.parseFloat(aktualnaLinia[aktualnaLinia.length - 1]));
+            if (aktualnaLinia.length < 3) {  // może się zdarzyć, że w pliku Matrix Market nie ma podanych wartości współrzędnych, wtedy tablica Stringów będzie trzymała tylko 2 elementy, nr wiersza i nr kolumny
+                aktualnaLiniaInt.add(Float.parseFloat(aktualnaLinia[aktualnaLinia.length - 1]));//dodaj do listy float sparsowany numer kolumny
+                aktualnaLiniaInt.add((float) 1); //a jaką drugą wartość dodaj do niej wartość 1
+            } else {                                                                             //jeśli l.elementów >2 to...
+                aktualnaLiniaInt.add(Float.parseFloat(aktualnaLinia[aktualnaLinia.length - 2])); //dodaj nr kolumny do listy float
+                aktualnaLiniaInt.add(Float.parseFloat(aktualnaLinia[aktualnaLinia.length - 1])); //dodaj wartość współrzędnych do listy float
             }
 
-            iterator = Integer.parseInt(aktualnaLinia[0]);
-            if (wierzcholek.get(iterator - 1).isEmpty()) {
-                wierzcholek.set(iterator - 1, aktualnaLiniaInt);  /// w razie wtf powrócić do add
-                rozmiar++;
-            } else {
-                List<Float> scalona = new ArrayList<>(wierzcholek.get(iterator - 1));
-                scalona.addAll(aktualnaLiniaInt);
-                wierzcholek.set(iterator - 1, scalona);
+            iterator = Integer.parseInt(aktualnaLinia[0]);  //nr wiersza przetwarzanej linijki pliku MM zostaje przypisany do zmiennej
+            if (wierzcholek.get(iterator - 1).isEmpty()) {  //jeśli numer elementu listy list odpowiadający numerowi wiersza we właśnie przetwarzanej linijce pliku MM jest pusty
+                wierzcholek.set(iterator - 1, aktualnaLiniaInt);  /// to przypisz do niego kolumnę i wartość
+                rozmiar++;  //zwiększ o 1 rozmiar
+            } else {                                        //jeśli element pod tym numerem ma już jakąś przypisaną wartość to...
+                List<Float> scalona = new ArrayList<>(wierzcholek.get(iterator - 1)); //stwórz tymaczasowo listę przechowującą tę wartość
+                scalona.addAll(aktualnaLiniaInt);       //na koniec tymczasowej listy zostaje dodana lista zawierająca nr kolumny i wartości
+                wierzcholek.set(iterator - 1, scalona); //nadpisz numer elementu dodając nową kolumnę i wartość
             }
         }
 
         boolean verbose = true;
+
+        //tak oto została skonstruowana lista ,,wierzchołek''  zawierająca kompletną informację o macierzy
+        //każdy element tej listy odpowiada odpowiedniemu wierszowi
+        //każdy taki element zawiera numer powiązanej relacją kolumny i przyporządkowaną wertość relacji
+
+        //Nie pozostaje już nic innego jak tylko użyć sterownika Neo4j i zacząć konstruować prawdziwe wierzchołki i relacje.
 
         System.out.println("\n\n");
 
