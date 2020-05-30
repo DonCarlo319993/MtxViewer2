@@ -116,32 +116,33 @@ public class MetodaBezposrednia {
 
         logger.info ("Rozpoczęcie budowania bazy grafowej na podstawie zebranych informacji...");
 
-        List<Node> nodes = new ArrayList<>();
-        List<Relationship> relacje = new ArrayList<>();
-        Relationship testowa;
+        List<Node> nodes = new ArrayList<>(); //powstaje lista obiektów typu Neo4j'owy 'wierzchołek'
+        List<Relationship> relacje = new ArrayList<>(); //powstaje lista obiektów typu Neo4j'owa 'relacja'
+        Relationship testowa;   //zmienna typu 'Relationship'
         logger.info ("Utworzono rodzaj relacji: testowa.");
 
-        GraphDatabaseService graf = new GraphDatabaseFactory().newEmbeddedDatabase(new File("C://MtxViewer//tymczasowaBazaGrafowa"));
+        GraphDatabaseService graf = new GraphDatabaseFactory()
+                .newEmbeddedDatabase(new File("C://MtxViewer//tymczasowaBazaGrafowa")); //utworzenie pustej bazy danych
         //org.apache.commons.io.FileUtils.
         logger.info ("Utworzono pustą bazę grafową.");
-        IndexDefinition indexDefinition;
+        IndexDefinition indexDefinition; //utworzono zmienną typu 'indeks'
         try (Transaction tx = graf.beginTx()) {
-            Schema schema = graf.schema();
-            indexDefinition = schema.indexFor(Label.label("Wierzcholek")).on("value").create();
-
+            Schema schema = graf.schema();   //tworzenie struktury schematu dla bazy danych
+            indexDefinition = schema.indexFor(Label.label("Wierzcholek")).on("value").create(); //zdefiniowanie ideksu na obiektach, które
+                                                                                    //mają label 'Wierzcholek' i właściwość 'value'
             tx.success();
-            logger.info ("Utworzono etykietę : Wierzchołek. ");
+            logger.info ("Utworzono indeksy na : Wierzcholek + value. ");
         }
 
         try (Transaction tx = graf.beginTx()) {
 
-            Label label = Label.label("Wierzcholek");
-            for (int i = 0; i < liczbaWierzch; i++) {
-                nodes.add(i, graf.createNode(label));
+            Label label = Label.label("Wierzcholek");               //utworzono zmienną typu 'Label'
+            for (int i = 0; i < liczbaWierzch; i++) {               //zostaje uruchomiona pętla o liczbie powtórzeń ustalonej przez rozmiar macierzy
+                nodes.add(i, graf.createNode(label));               //dodaj do listy wierzchołków nowy wierzchołek z labelem 'Wierzcholek'
             }
-            for (int i = 0; i < liczbaWierzch; i++) {
-                nodes.get(i).setProperty("value", i + 1);
-            }
+            for (int i = 0; i < liczbaWierzch; i++) {               //
+                nodes.get(i).setProperty("value", i + 1);           //dla nowo dodanego wierzchołka właściwość 'value' przyjmie wartość odpowiadającą liczbie
+            }                                                       //wiersza/kolumny który reprezentuje
 
             logger.info ("Utworzono pomyślnie "+liczbaWierzch+" wierzchołków.");
 
@@ -156,19 +157,19 @@ public class MetodaBezposrednia {
             logger.info ("Tworzenie relacji między wierzchołkami...");
 
 
-            for (int i = 0; i < liczbaWierzch; i++) {
-                liczbaElementow = wierzcholek.get(i).size();
-                for (int j = 0; j < liczbaElementow; j = j + 2) {
+            for (int i = 0; i < liczbaWierzch; i++) {  //ilość powtórzeń głównej pętli równa się rozmiarowi macierzy
+                liczbaElementow = wierzcholek.get(i).size(); //zmienna 'liczbaElementow' to liczba elementów każdego kolejnego indeksu w liście 'wierzcholek', docelowo są to 2 elementy: kolumna i wartość
+                for (int j = 0; j < liczbaElementow; j = j + 2) { //
                     System.out.println(wierzcholek.get(i).get(j));
-                    temp = wierzcholek.get(i).get(j);
-                    indeks = (int) temp;
-                    if (nodes.get(i) != nodes.get(indeks - 1)) {
-                        testowa = nodes.get(i).createRelationshipTo(nodes.get(indeks - 1), RelTypes.RELACJA);
-                        testowa.setProperty("value", wierzcholek.get(i).get(j + 1));
+                    temp = wierzcholek.get(i).get(j);       //tymczasowo trzymaj numer kolumny dla i-tego wiersza
+                    indeks = (int) temp;                    //sparsowanie numeru kolumny do int'a i przypisanie do zmiennej 'indeks'
+                    if (nodes.get(i) != nodes.get(indeks - 1)) { //jeżeli nie istnieje jeszcze taki wierzchołek to... w tym warunku chodzi o to, żeby nie tworzyć dwa razy tej samej relacji. Numer wierzchołka odnosi się tak samo do numeru wiersza macierzy jak i kolumny.
+                        testowa = nodes.get(i).createRelationshipTo(nodes.get(indeks - 1), RelTypes.RELACJA); //zostaje ustanowiona relacja między dwoma wierzchołkami
+                        testowa.setProperty("value", wierzcholek.get(i).get(j + 1)); //oraz ustawiona odpowiednia właściwość relacji
                     }
                 }
             }
-            tx.success();
+            tx.success();  //i to wszystko
             stopCzas = System.currentTimeMillis ();
             logger.info ("Tworzenie relacji zakończono pomyślnie.");
             logger.info ("Baza grafowa jest gotowa!");
