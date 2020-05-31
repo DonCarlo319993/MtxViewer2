@@ -1,10 +1,8 @@
 package main;
-import org.apache.commons.io.FileUtils;
+
 import org.apache.log4j.Logger;
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
-import org.neo4j.graphdb.schema.IndexDefinition;
-import org.neo4j.graphdb.schema.Schema;
 
 import java.io.File;
 import java.io.IOException;
@@ -88,6 +86,8 @@ public class MetodaBezposrednia {
                 wierzcholek.set(iterator - 1, scalona); //nadpisz numer elementu dodając nową kolumnę i wartość
             }
         }
+        odczyt.close ();
+
 
         boolean verbose = true;
 
@@ -101,14 +101,14 @@ public class MetodaBezposrednia {
 
 
         MainWindowController mainWindowController = new MainWindowController();
-        for (int i = 0; i < wierzcholek.size(); i++) {
+       /* for (int i = 0; i < wierzcholek.size(); i++) {
             if (verbose) {
                 System.out.println("Wierzchołek " + (i + 1) + ": " + wierzcholek.get(i));
-               /* mainWindowController.logger = wierzcholek.get(i).toString();
+               *//* mainWindowController.logger = wierzcholek.get(i).toString();
                 System.out.println(mainWindowController.logger);
-                mainWindowController.wypiszLog();*/
+                mainWindowController.wypiszLog();*//*
             }
-        }
+        }*/
 
         logger.info ("Informacje zebrane pomyślnie.");
 
@@ -119,7 +119,74 @@ public class MetodaBezposrednia {
         List<Node> nodes = new ArrayList<>(); //powstaje lista obiektów typu Neo4j'owy 'wierzchołek'
         List<Relationship> relacje = new ArrayList<>(); //powstaje lista obiektów typu Neo4j'owa 'relacja'
         Relationship testowa;   //zmienna typu 'Relationship'
-        logger.info ("Utworzono rodzaj relacji: testowa.");
+
+        //-------------------------------- tutaj kod eksperymentalny ----------------------------------
+        int size;
+        int wiersz, kolumna, wartosc;
+        odczyt = new Scanner(macierz);
+        String line = odczyt.nextLine ();
+
+        GraphDatabaseService graf = new GraphDatabaseFactory ()
+                .newEmbeddedDatabase(new File("C://MtxViewer//tymczasowaBazaGrafowa")); //utworzenie pustej bazy danych
+        Label label = Label.label("Wierzcholek");
+
+
+        while (odczyt.nextLine ().startsWith ("%")){
+            line = odczyt.nextLine ();
+        }
+        size = Integer.parseInt (line.split (" ")[0]);
+
+        //aktualnaLinia = odczyt.nextLine ().split (" ");
+        //size = Integer.parseInt (aktualnaLinia[0]);
+
+        try (Transaction tx = graf.beginTx()){
+        for (int i = 0; i<size; i++){
+            nodes.add (i, graf.createNode (label));
+            nodes.get (i).setProperty ("value", i+1);
+        }
+            tx.success ();
+        }
+        try (Transaction tx = graf.beginTx()){
+            while (odczyt.hasNextLine ()){
+                aktualnaLinia = odczyt.nextLine ().split (" ");
+                wiersz = Integer.parseInt (aktualnaLinia[0]);
+                System.out.println ("wiersz= "+wiersz);
+                kolumna = Integer.parseInt (aktualnaLinia[1]);
+                System.out.println ("kolumna= "+kolumna);
+
+                if (aktualnaLinia.length == 3){
+                    System.out.println ("aktualnaLinia.lenght= "+aktualnaLinia.length);
+                    wartosc = Integer.parseInt (aktualnaLinia[2]);
+                    System.out.println ("wartosc= "+wartosc);
+                    testowa = nodes.get (wiersz-1).createRelationshipTo (nodes.get (kolumna-1), RelTypes.RELACJA);
+                    System.out.println ("wiersz + kolumna="+wiersz+" + "+kolumna);
+                    testowa.setProperty ("value", wartosc);
+                }else {
+                    testowa = nodes.get (wiersz-1).createRelationshipTo (nodes.get (kolumna-1), RelTypes.RELACJA);
+                    testowa.setProperty ("value", 1);
+                }
+            }
+            tx.success ();
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        //-------------------------------- tutaj kod eksperymentalny ----------------------------------
+
+       /* logger.info ("Utworzono rodzaj relacji: testowa.");
 
         GraphDatabaseService graf = new GraphDatabaseFactory()
                 .newEmbeddedDatabase(new File("C://MtxViewer//tymczasowaBazaGrafowa")); //utworzenie pustej bazy danych
@@ -136,23 +203,15 @@ public class MetodaBezposrednia {
 
         try (Transaction tx = graf.beginTx()) {
 
-            Label label = Label.label("Wierzcholek");               //utworzono zmienną typu 'Label'
+            Label label = Label.label("Wierzcholek");               //utworzono label 'Wierzcholek'
             for (int i = 0; i < liczbaWierzch; i++) {               //zostaje uruchomiona pętla o liczbie powtórzeń ustalonej przez rozmiar macierzy
-                nodes.add(i, graf.createNode(label));               //dodaj do listy wierzchołków nowy wierzchołek z labelem 'Wierzcholek'
+                nodes.add(i, graf.createNode(label));               //dodaj do listy wierzchołków nowy wierzchołek mieniący się labelem 'Wierzcholek'
             }
             for (int i = 0; i < liczbaWierzch; i++) {               //
                 nodes.get(i).setProperty("value", i + 1);           //dla nowo dodanego wierzchołka właściwość 'value' przyjmie wartość odpowiadającą liczbie
             }                                                       //wiersza/kolumny który reprezentuje
 
             logger.info ("Utworzono pomyślnie "+liczbaWierzch+" wierzchołków.");
-
-            System.out.println(nodes.get(6).getProperty("value"));
-            System.out.println(Math.round(wierzcholek.get(2).get(0)));
-
-            testowa = nodes.get(2).createRelationshipTo(nodes.get(3), RelTypes.RELACJA);
-            relacje.add(testowa);
-            testowa = nodes.get(5).createRelationshipTo(nodes.get(7), RelTypes.RELACJA);
-            relacje.add(testowa);
 
             logger.info ("Tworzenie relacji między wierzchołkami...");
 
@@ -169,7 +228,7 @@ public class MetodaBezposrednia {
                     }
                 }
             }
-            tx.success();  //i to wszystko
+            tx.success();  //i to wszystko.
             stopCzas = System.currentTimeMillis ();
             logger.info ("Tworzenie relacji zakończono pomyślnie.");
             logger.info ("Baza grafowa jest gotowa!");
@@ -179,7 +238,7 @@ public class MetodaBezposrednia {
             logger.info ("Rozmiar bazy: "+rozmiarBazy+" bajtów");
         }
 
-        graf.shutdown();
+        graf.shutdown();*/
 
     }
 }
