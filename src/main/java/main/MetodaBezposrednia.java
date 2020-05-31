@@ -114,6 +114,7 @@ public class MetodaBezposrednia {
 
         //Tutaj będę tworzył bazę grafową
 
+
         logger.info ("Rozpoczęcie budowania bazy grafowej na podstawie zebranych informacji...");
 
         List<Node> nodes = new ArrayList<>(); //powstaje lista obiektów typu Neo4j'owy 'wierzchołek'
