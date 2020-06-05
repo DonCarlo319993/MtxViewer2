@@ -23,12 +23,7 @@ public class MtxToCsv {
 
     public void bazaM2() throws IOException {
 
-        logger.info ("Wejście do ciała metody o nazwie bazaM2...");
-
-
         org.apache.commons.io.FileUtils.cleanDirectory(new File("C:/MtxViewer/tymczasowaBazaGrafowa"));
-        logger.info ("Kasowanie nieaktualnej tymczasowej bazy danych...");
-
 
         File macierz = new File(sciezkapliku);
         PrintWriter zapis = new PrintWriter("C:/MtxViewer/tymczasowyPlikCsv/"+nazwaPliku);
@@ -36,57 +31,58 @@ public class MtxToCsv {
         String tekst = odczyt.nextLine();
         String[] aktualnaLinia;
         String dopisz;
-        int rozmiarM;
-        long startCzas;
-        long stopCzas;
-        long rozmiarBazy;
+        int rozmiarM, lKrawedzi;
+        long startCzas, stopCzas, rozmiarBazy, pustaBCz, tworzenieWCz, laczenieRCz, tworzenieCSVCz;
 
-        logger.info ("Pomyślnie załadowano zmienne.");
-        logger.info ("Wczytywanie macierzy...");
-        logger.info ("Rozpoczęcie pomiaru czasu wykonania metody.");
-        startCzas=System.currentTimeMillis ();
-        while (tekst.startsWith("%")){
+        while (tekst.startsWith("%")){              //omijanie informacyjnych wierszy
             tekst = odczyt.nextLine();
             System.out.println(tekst);
         }
-        logger.info ("Pominięto początkowy opis macierzy");
 
         aktualnaLinia = tekst.split(" ");
-        rozmiarM = Integer.parseInt(aktualnaLinia[0]);
+        rozmiarM = Integer.parseInt(aktualnaLinia[0]);              //zczytanie rozmiaru macierzy
+        lKrawedzi = Integer.parseInt (aktualnaLinia[2]);
 
-        while (odczyt.hasNextLine()){
+        startCzas=System.currentTimeMillis ();
+        while (odczyt.hasNextLine()){                           //tworzenie pliku CSV
             tekst = odczyt.nextLine();
-            aktualnaLinia = tekst.split(" ");
-            dopisz = aktualnaLinia[0]+","+aktualnaLinia[1]+","+aktualnaLinia[2];
-            zapis.println(dopisz);
+            aktualnaLinia = tekst.split(" ");                  //rozdziel tekst, przypisz wartości do komórek tablicy
+            if (aktualnaLinia.length == 3) {
+                dopisz = aktualnaLinia[0] + "," + aktualnaLinia[1] + "," + aktualnaLinia[2];     //utwórz łańcuch znaków w formacie csv, czyli z wartościami po przecinku
+                zapis.println (dopisz);                                                  //zapisz w nowym pliku
+            }else {
+                dopisz = aktualnaLinia[0] + "," + aktualnaLinia[1] + "," +1;     //utwórz łańcuch znaków w formacie csv, czyli z wartościami po przecinku
+                zapis.println (dopisz);
+            }
         }
         zapis.close();
-        logger.info ("zostanie utworzonych : "+aktualnaLinia[0]+" wierzchołków oraz "+aktualnaLinia[2]+" relacji.");
+        odczyt.close ();
+        stopCzas=System.currentTimeMillis ();
+        tworzenieCSVCz = stopCzas - startCzas;
 
 
-        GraphDatabaseService db = new GraphDatabaseFactory()
+        startCzas =System.currentTimeMillis ();
+        GraphDatabaseService db = new GraphDatabaseFactory()                                                //utwórz pustą bazę danych
                 .newEmbeddedDatabaseBuilder(new File("C://MtxViewer//tymczasowaBazaGrafowa"))
                 .setConfig(GraphDatabaseSettings.allow_file_urls, "true").newGraphDatabase();
-        logger.info ("Utworzono pustą bazę grafową.");
-
+        stopCzas = System.currentTimeMillis ();
+        pustaBCz =stopCzas - startCzas;
 
 
         try ( Transaction tx = db.beginTx())
         {
             String query;
 
-            for (int i = 1; i<=rozmiarM; i++) {
+            startCzas = System.currentTimeMillis ();
+            for (int i = 1; i<=rozmiarM; i++) {                         //tworzenie wierzchołków
                 query = "CREATE (:Pierwszy {PierwszyId:"+i+" } )";
                 Result zapytanko = db.execute(query);
             }
-            logger.info ("Utworzono wierzchołki grafu.");
+            stopCzas = System.currentTimeMillis ();
+            tworzenieWCz = stopCzas - startCzas;
 
-
-            logger.info ("Wczytywanie pliku CSV.");
-            logger.info ("Wykonywanie zapytania w celu stworzenia połączeń relacyjnych.");
-
-
-            Result importCSV =
+            startCzas = System.currentTimeMillis ();
+            Result importCSV =                                                                                              //import utworzonego wcześniej pliku CSV i utworzenie relacji
                     db.execute("LOAD CSV FROM 'file:///C:/MtxViewer/tymczasowyPlikCsv/"+nazwaPliku+"' " +
                             "AS row" +
                             " MATCH (a:Pierwszy {PierwszyId: toInteger(row[0])}), (b:Pierwszy {PierwszyId: toInteger(row[1])}) " +
@@ -94,17 +90,20 @@ public class MtxToCsv {
                             " RETURN a, b");
             tx.success();
             stopCzas = System.currentTimeMillis ();
-            boolean logPstryk = true;
-            logger.info ("Baza grafowa jest gotowa!");
-            logger.info ("Baza zbudowana w "+(stopCzas-startCzas)+" milisekund");
-            File folder = new File("C://MtxViewer//tymczasowaBazaGrafowa");
-            rozmiarBazy = FileUtils.sizeOfDirectory (folder);
-            logger.info ("Rozmiar bazy: "+rozmiarBazy+" bajtów");
-
-
+            laczenieRCz = stopCzas - startCzas;
         }
+        logger.info ("Graf został pomyślnie odwzorowany!");
+        logger.info ("Liczba wierzchołków w grafie : "+rozmiarM);
+        logger.info ("Liczba krawedzi w grafie: "+lKrawedzi);
+        logger.info ("Plik .csv utworzony w: "+tworzenieCSVCz+" milisekund");
+        logger.info ("Pusta baza utworzona w: "+pustaBCz+" milisekund");
+        logger.info ("Wierzchołki utworzone w: "+tworzenieWCz+" milisekund");
+        logger.info ("Import pliku .csv + połączenie relacjami wierzchołków wykonano w: "+laczenieRCz+" milisekund");
+
+        File folder = new File("C://MtxViewer//tymczasowaBazaGrafowa");
+        rozmiarBazy = FileUtils.sizeOfDirectory (folder);
+        logger.info ("Rozmiar bazy: "+rozmiarBazy+" bajtów");
 
         db.shutdown();
-
     }
 }

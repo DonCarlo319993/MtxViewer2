@@ -23,7 +23,6 @@ import java.util.zip.ZipOutputStream;
 public class MainWindowController implements Initializable {
 
     final static Logger logger2 = Logger.getLogger (MainWindow.class.getName ());
-    public static boolean pstryk = false;
 
     Stage stage;
     String tempNazwaPliku;
@@ -33,7 +32,11 @@ public class MainWindowController implements Initializable {
    @FXML
    Button przyciskWybierz, przyciskStart, przyciskPokazGraf, odswiez;
 
-   @FXML
+    public void setEtykietaLokalizacji(Label etykietaLokalizacji) {
+        this.etykietaLokalizacji = etykietaLokalizacji;
+    }
+
+    @FXML
    Label etykietaLokalizacji;
 
    @FXML
@@ -166,7 +169,7 @@ public void funkcja() throws IOException, InterruptedException {
     FileUtils.copyDirectory(new File("C:/MtxViewer/tymczasowaBazaGrafowa"), new File("C:/Program Files/Neo4jServer/neo4j-community-3.5.12/data/databases/graph.db"));
     Runtime.getRuntime().exec("cmd /c start /min cmd.exe /K \"cd C:/Program Files/Neo4jServer/neo4j-community-3.5.12/bin && neo4j console\"");
 
-    Thread.sleep(12000);
+    Thread.sleep(15000);
     BrowserController browserController = new BrowserController();
     browserController.otworzBrowser();
 }
