@@ -27,7 +27,7 @@ public class MetodaBezposrednia {
 
         int wiersz, kolumna, size, lKrawedzi;         //zmienne związane z budową bazy grafowej
         float wartosc;                      // ta również
-        long startCzas, stopCzas, rozmiarBazy, pustaBCz, tworzenieWCz, laczenieRCz ;   //zmienne związane z pomiarem różnych rzeczy
+        long startCzas, stopCzas, rozmiarBazy, pustaBCz, tworzenieWCz, laczenieRCz, lacznyCzas;   //zmienne związane z pomiarem różnych rzeczy
 
 
         List<Node> nodes = new ArrayList<>(); //powstaje lista obiektów typu Neo4j'owy 'wierzchołek'
@@ -78,26 +78,48 @@ public class MetodaBezposrednia {
             stopCzas = System.currentTimeMillis ();
         }
         laczenieRCz = stopCzas-startCzas;
+        lacznyCzas = pustaBCz+tworzenieWCz+laczenieRCz;
 
         logger.info ("Graf został pomyślnie odwzorowany!");
         logger.info ("Liczba wierzchołków w grafie : "+size);
         logger.info ("Liczba krawedzi w grafie: "+lKrawedzi);
-        logger.info ("Pusta baza utworzona w: "+pustaBCz+" milisekund");
-        logger.info ("Wierzchołki utworzone w: "+tworzenieWCz+" milisekund");
-        logger.info ("Wierzchołki połączone relacjami w: "+laczenieRCz+" milisekund");
+
+        logger.info ("Pusta baza utworzona w: "+timer (pustaBCz));
+        logger.info ("Wierzchołki utworzone w: "+timer (tworzenieWCz));
+        logger.info ("Relacje utworzono w: "+timer (laczenieRCz));
+        logger.info ("Łączny czas: "+timer (lacznyCzas));
+
         File folder = new File("C://MtxViewer//tymczasowaBazaGrafowa");
         rozmiarBazy = FileUtils.sizeOfDirectory (folder);
         logger.info ("Rozmiar bazy: "+rozmiarBazy+" bajtów");
 
         graf.shutdown ();
-
-        /*if (rozmiarBazy > 0){
-            MainWindowController controller = new MainWindowController ();
-            controller.etykietaLokalizacji.setText ("blablabla");
-        }*/
         }
 
+    public static String timer(long czas){
+        int msek, sek, min;
+        String napis="";
+        if (czas/60000 >= 1){
+            min = (int) (czas/60000);
+        }else {
+            min = 0;
+        }
+        if (min >= 1){
+            sek = (int) ((czas - (60000*min))/1000);
+        }else {
+            sek = (int) (czas/1000);
+        }
+        if (min >=1 && sek >= 1){
+            msek = (int) (czas - (60000*min + 1000*sek));
+        }else if (min>=1 && sek ==0){
+            msek = (int) (czas-60000*min);
+        }else if (min ==0 && sek >=1){
+            msek = (int) (czas - 1000*sek);
+        }else {
+            msek = (int) czas;
+        }
+        napis = min+"min "+sek+"sek "+msek+"ms";
 
-
-
+        return napis;
+    }
 }

@@ -32,7 +32,7 @@ public class MtxToCsv {
         String[] aktualnaLinia;
         String dopisz;
         int rozmiarM, lKrawedzi;
-        long startCzas, stopCzas, rozmiarBazy, pustaBCz, tworzenieWCz, laczenieRCz, tworzenieCSVCz;
+        long startCzas, stopCzas, rozmiarBazy, pustaBCz, tworzenieWCz, laczenieRCz, tworzenieCSVCz, lacznyCzas;
 
         while (tekst.startsWith("%")){              //omijanie informacyjnych wierszy
             tekst = odczyt.nextLine();
@@ -92,13 +92,20 @@ public class MtxToCsv {
             stopCzas = System.currentTimeMillis ();
             laczenieRCz = stopCzas - startCzas;
         }
+
+        lacznyCzas = tworzenieCSVCz+pustaBCz+tworzenieWCz+laczenieRCz;
+
+
+
         logger.info ("Graf został pomyślnie odwzorowany!");
         logger.info ("Liczba wierzchołków w grafie : "+rozmiarM);
         logger.info ("Liczba krawedzi w grafie: "+lKrawedzi);
-        logger.info ("Plik .csv utworzony w: "+tworzenieCSVCz+" milisekund");
-        logger.info ("Pusta baza utworzona w: "+pustaBCz+" milisekund");
-        logger.info ("Wierzchołki utworzone w: "+tworzenieWCz+" milisekund");
-        logger.info ("Import pliku .csv + połączenie relacjami wierzchołków wykonano w: "+laczenieRCz+" milisekund");
+
+        logger.info ("Plik .csv utworzony w: "+timer (tworzenieCSVCz));
+        logger.info ("Pusta baza utworzona w: "+timer (pustaBCz));
+        logger.info ("Wierzchołki utworzone w: "+timer (tworzenieWCz));
+        logger.info ("Import pliku .csv + połączenie relacjami wierzchołków wykonano w: "+timer (laczenieRCz));
+        logger.info ("Łączny czas: "+timer (lacznyCzas));
 
         File folder = new File("C://MtxViewer//tymczasowaBazaGrafowa");
         rozmiarBazy = FileUtils.sizeOfDirectory (folder);
@@ -106,4 +113,33 @@ public class MtxToCsv {
 
         db.shutdown();
     }
+
+
+    public static String timer(long czas){
+        int msek, sek, min;
+        String napis="";
+        if (czas/60000 >= 1){
+            min = (int) (czas/60000);
+        }else {
+            min = 0;
+        }
+        if (min >= 1){
+            sek = (int) ((czas - (60000*min))/1000);
+        }else {
+            sek = (int) (czas/1000);
+        }
+        if (min >=1 && sek >= 1){
+            msek = (int) (czas - (60000*min + 1000*sek));
+        }else if (min>=1 && sek ==0){
+            msek = (int) (czas-60000*min);
+        }else if (min ==0 && sek >=1){
+            msek = (int) (czas - 1000*sek);
+        }else {
+            msek = (int) czas;
+        }
+        napis = min+"min "+sek+"sek "+msek+"ms";
+
+        return napis;
+    }
 }
+

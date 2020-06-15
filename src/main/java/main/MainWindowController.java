@@ -32,19 +32,16 @@ public class MainWindowController implements Initializable {
    @FXML
    Button przyciskWybierz, przyciskStart, przyciskPokazGraf, odswiez;
 
-    public void setEtykietaLokalizacji(Label etykietaLokalizacji) {
-        this.etykietaLokalizacji = etykietaLokalizacji;
-    }
 
     @FXML
    Label etykietaLokalizacji;
+
 
    @FXML
     CheckBox metodaMieszana, metodaBezposrednia;
 
    @FXML
    TextArea textArea;
-
 
 
     public static void zamknijProgram() throws IOException {
